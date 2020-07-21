@@ -16,9 +16,9 @@ var Author = require('./models/author')
 var Genre = require('./models/genre')
 var BookInstance = require('./models/bookinstance')
 
-
+var pass = '0914719213Md!'
 var mongoose = require('mongoose');
-var mongoDB = "mongodb://127.0.0.1:27017/test";
+var mongoDB = "mongodb+srv://ridwan:" + pass + "@library.dkyyv.mongodb.net/library?retryWrites=true&w=majority";
 mongoose.connect(mongoDB, {
   useNewUrlParser: true
 });
