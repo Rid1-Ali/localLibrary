@@ -23,7 +23,21 @@ exports.author_list = function (req, res) {
 
 // Display detail page for a specific Author.
 exports.author_detail = function (req, res) {
-    res.send('NOT IMPLEMENTED: Author detail: ' + req.params.id);
+    
+    Author.find()
+        .populate('author')
+        .sort([
+            ['family_name', ['ascending']]
+        ])
+        .exec(function (err, list_authors) {
+            if (err) {
+                return nextTick(err);
+            }
+            res.render('author_list', {
+                title: 'Author List',
+                author_list: list_authors
+            })
+        })
 };
 
 // Display Author create form on GET.
