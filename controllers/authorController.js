@@ -1,7 +1,6 @@
 var Author = require('../models/author');
-const {
-    nextTick
-} = require('async');
+var Book = require('../models/book');
+var async = require('async')
 
 // Display list of all Authors.
 exports.author_list = function (req, res) {
@@ -12,7 +11,7 @@ exports.author_list = function (req, res) {
         ])
         .exec(function (err, list_authors) {
             if (err) {
-                return nextTick(err);
+                return next(err);
             }
             res.render('author_list', {
                 title: 'Author List',
@@ -23,21 +22,30 @@ exports.author_list = function (req, res) {
 
 // Display detail page for a specific Author.
 exports.author_detail = function (req, res) {
-    
-    Author.find()
-        .populate('author')
-        .sort([
-            ['family_name', ['ascending']]
-        ])
-        .exec(function (err, list_authors) {
-            if (err) {
-                return nextTick(err);
-            }
-            res.render('author_list', {
-                title: 'Author List',
-                author_list: list_authors
-            })
+    async.parallel({
+        author: function (callback) {
+            Author.findById(req.params.id)
+                .exec(callback);
+        },
+        books: function (callback) {
+            Book.find({
+                'author': req.params.id
+            }).exec(callback)
+        }
+    }, function (err, results) {
+        
+        if (results.author == null) {
+            var err = new Error('Author Not Found!')
+            err.status = 404
+            res.render('error',{error : err})
+        }
+        res.render('author_detail', {
+            title: 'Author Detail',
+            author: results.author,
+            books : results.books
         })
+    })
+
 };
 
 // Display Author create form on GET.

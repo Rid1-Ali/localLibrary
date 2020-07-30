@@ -1,0 +1,11 @@
+extends layout
+
+block content
+
+    h1 ID: #{bookinstance.id}
+    p
+        |Title: 
+        a(href=bookinstance.book.url) #{href=bookinstance.book.title}
+    p Imprint: #{bookinstance.imprint}
+    p Status: #{bookinstance.status}
+    p Due Back: #{bookinstance.due_back_formatted}
