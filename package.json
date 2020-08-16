@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "debug": "nodemon mozzila"
   },
   "author": "Ridwan A. Mohammed",
   "license": "ISC",

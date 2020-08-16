@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    h1= title
+    h2= genre.name
+    if books.length
+        h3 You need to remove the following books before removing this genre.
+        ul
+            for book in books
+                li
+                    a(href=book.url) #{book.title}
+    else
+        form(action="", method="post")
+            div.form-group
+                input#genreid.form-control(type='hidden', name='genreid', required='true', value=genre._id)
+            button.btn.btn-primary(type='submit') Delete

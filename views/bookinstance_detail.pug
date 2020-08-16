@@ -9,3 +9,7 @@ block content
     p Imprint: #{bookinstance.imprint}
     p Status: #{bookinstance.status}
     p Due Back: #{bookinstance.due_back_formatted}
+
+    hr
+    p
+        a(href=bookinstance.url+'/delete') Delete Book Instance

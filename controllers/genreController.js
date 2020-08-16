@@ -1,5 +1,8 @@
 var Genre = require('../models/genre');
 const validator = require('express-validator');
+const async = require('async');
+const Book = require('../models/book');
+var ObjectId = require('mongoose').Types.ObjectId;
 
 
 // Display list of all Genre.
@@ -19,11 +22,14 @@ exports.genre_list = function (req, res) {
 // Display detail page for a specific Genre.
 exports.genre_detail = function (req, res) {
     Genre.findById(req.params.id).exec(
-        function(err, theGenre){
+        function (err, theGenre) {
             if (err) {
                 return next(err)
             }
-            res.render('genre_detail', {title: theGenre})
+            res.render('genre_detail', {
+                title: 'Genre Detail',
+                genre: theGenre
+            })
         }
     )
 };
@@ -103,13 +109,62 @@ exports.genre_create_post = [
 ];
 
 // Display Genre delete form on GET.
-exports.genre_delete_get = function (req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete GET');
+exports.genre_delete_get = function (req, res, next) {
+    async.parallel({
+        genre: function (callback) {
+            Genre.findById(req.params.id).exec(callback);
+        },
+        books: function (callback) {
+            Book.find({
+                genre: new ObjectId(req.params.id)
+            }).populate('genre').exec(callback)
+        }
+    }, function (err, results) {
+        if (err || results.genre === 'undefined' || results.books === 'undefined') {
+            res.render('error', {})
+            return;
+        }
+        res.render('genre_delete', {
+            title: 'Delete Genre',
+            genre: results.genre,
+            books: results.books
+        })
+
+    })
 };
 
 // Handle Genre delete on POST.
-exports.genre_delete_post = function (req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete POST');
+exports.genre_delete_post = function (req, res, next) {
+    async.parallel({
+        genre: function (callback) {
+            Genre.findById(req.params.id).exec(callback);
+        },
+        books: function (callback) {
+            Book.find({
+                genre: new ObjectId(req.params.id)
+            }).populate('genre').exec(callback)
+        }
+    }, function(err, results){
+        if (err) {
+            res.render('error', {});
+            return;
+        }
+        if (results.books.length != 0) {
+            res.render('genre_delete', {
+                title: 'Delete Genre',
+                genre: results.genre,
+                books: results.books
+            });
+            return;
+        }
+        Genre.findByIdAndRemove(req.params.id, function deleteGenre(err) {
+            if (err) {
+                red.render('error', {})
+                return;
+            }
+            res.redirect('/catalog/genres')
+        })
+    })
 };
 
 // Display Genre update form on GET.

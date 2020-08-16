@@ -2,4 +2,8 @@ extends layout
 
 block content
 
-    h1= title.name
+    h1= title
+    h3= genre.name
+    hr
+    p
+        a(href=genre.url+'/delete') Delete Genre
