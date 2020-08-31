@@ -1,7 +1,15 @@
 var Genre = require('../models/genre');
-const validator = require('express-validator');
+//const validator = require('express-validator');
 const async = require('async');
 const Book = require('../models/book');
+const {
+    body,
+    validationResult
+} = require('express-validator/check');
+const {
+    sanitizeBody
+} = require('express-validator/filter');
+
 var ObjectId = require('mongoose').Types.ObjectId;
 
 
@@ -47,22 +55,20 @@ exports.genre_create_get = function (req, res) {
 exports.genre_create_post = [
 
     // Validate that the name field is not empty.
-    validator.body('name', 'Genre name required').trim().isLength({
+    body('name', 'Genre name required').trim().isLength({
         min: 1
     }),
 
 
     // Sanitize (escape) the name field.
-    validator.sanitizeBody('name').escape(),
+    sanitizeBody('name').escape(),
 
     // Process request after validation and sanitization.
     (req, res, next) => {
 
         // Extract the validation errors from a request.
-        const errors = validator.validationResult(req);
-        console.log("---------");
-        console.log(req.body);
-        console.log("---------");
+        const errors = validationResult(req);
+        
         // Create a genre object with escaped and trimmed data.
         var genre = new Genre({
             name: req.body.name
@@ -144,7 +150,7 @@ exports.genre_delete_post = function (req, res, next) {
                 genre: new ObjectId(req.params.id)
             }).populate('genre').exec(callback)
         }
-    }, function(err, results){
+    }, function (err, results) {
         if (err) {
             res.render('error', {});
             return;
@@ -159,7 +165,7 @@ exports.genre_delete_post = function (req, res, next) {
         }
         Genre.findByIdAndRemove(req.params.id, function deleteGenre(err) {
             if (err) {
-                red.render('error', {})
+                res.render('error', {})
                 return;
             }
             res.redirect('/catalog/genres')
@@ -168,11 +174,55 @@ exports.genre_delete_post = function (req, res, next) {
 };
 
 // Display Genre update form on GET.
-exports.genre_update_get = function (req, res) {
-    res.send('NOT IMPLEMENTED: Genre update GET');
+exports.genre_update_get = function (req, res, next) {
+    async.parallel({
+            
+            genre: function (callback) {
+                Genre.findById(req.params.id).exec(callback)
+            }
+        },
+        function (err, results) {
+            if (err || results.genre === 'undefined') {
+                res.render('error', {})
+                return;
+            }
+            res.render('genre_form', {title : " Update Genre", genre : results.genre})
+        })
 };
 
 // Handle Genre update on POST.
-exports.genre_update_post = function (req, res) {
-    res.send('NOT IMPLEMENTED: Genre update POST');
-};
+exports.genre_update_post = [
+    body('name', 'Please check the name.').trim().isLength({min : 1}),
+    sanitizeBody('name').escape(),
+    
+    (req, res, next) => {
+ 
+        const errros = validationResult(req);
+
+        var genre = new Genre({
+            name : req.body.name,
+            _id : req.params.id
+        });
+
+        if(!errros.isEmpty()){
+            async.parallel({
+                genre: function (callback) {
+                    Genre.findById(req.params.id).exec(callback)
+                }
+            }, function(err, results){
+                if (err) {
+                    return next(err);
+                }
+                res.render('genre_form', {title: "Update Genre", genre : results.genre, errors : errros.array()})
+            })
+        }else{
+            Genre.findByIdAndUpdate(req.params.id , genre, {}, function (err, thegenre) {
+                if (err) {
+                    return res.render('error', {})
+                }
+                res.redirect(thegenre.url)
+            })
+        }
+
+    }
+];

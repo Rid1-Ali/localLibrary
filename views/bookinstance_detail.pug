@@ -3,6 +3,7 @@ extends layout
 block content
 
     h1 ID: #{bookinstance.id}
+    h3 test: #{bookinstance.test}
     p
         |Title: 
         a(href=bookinstance.book.url) #{href=bookinstance.book.title}
@@ -11,5 +12,7 @@ block content
     p Due Back: #{bookinstance.due_back_formatted}
 
     hr
+    p
+        a(href=bookinstance.url+'/update') Update Book Instance
     p
         a(href=bookinstance.url+'/delete') Delete Book Instance
