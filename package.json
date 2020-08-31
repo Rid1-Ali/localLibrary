@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "14.2.0"
+  },
   "scripts": {
     "start": "node index.js",
     "debug": "nodemon mozzila"

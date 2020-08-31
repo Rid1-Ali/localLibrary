@@ -10,7 +10,8 @@ var app = express();
 
 
 var pass = '0914719213Md!'
-var mongoDB = "mongodb+srv://ridwan:" + pass + "@library.dkyyv.mongodb.net/library?retryWrites=true&w=majority";
+var dev_db_url = "mongodb+srv://ridwan:" + pass + "@library.dkyyv.mongodb.net/library?retryWrites=true&w=majority";
+var mongoDB = process.env.MONGODB_URI || dev_db_url
 mongoose.connect(mongoDB, {
     useNewUrlParser: true
 });
