@@ -44,7 +44,6 @@ app.use('/test', function (req, res) {
 
 
 
-app.listen(3000, function () {
-    console.log("App listening at 3000");
-
-})
+app.listen(process.env.PORT || 3000, function () {
+    console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
+});
