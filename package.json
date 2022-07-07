@@ -19,7 +19,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.6.1",
     "helmet": "^4.1.0",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "mongoose": "^5.9.20",
     "pug": "^3.0.0",
     "validator": "^13.1.1"
